@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Dance Battle Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="neon-title">DANCE<br><span class="pink">BATTLE</span></h1>
+            
+            <div class="player-setup">
+                <h2>Add Players</h2>
+                <div id="player-list-setup">
+                    <input type="text" id="player-input" placeholder="Enter Player Name" maxlength="15">
+                    <button id="add-player-btn" class="neon-button">Add</button>
+                </div>
+                <ul id="players-ul"></ul>
+            </div>
+            
+            <button id="start-btn" class="neon-button play-btn" disabled>PLAY</button>
+            <p class="instructions">Supports Keyboard (Arrows), Mouse, and Touch.</p>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <header>
+                <div class="turn-info">
+                    <h2>TURN: <span id="current-player-name" class="cyan">Player</span></h2>
+                    <div class="timer-bar-container"><div id="timer-bar"></div></div>
+                </div>
+            </header>
+
+            <div class="game-area">
+                <!-- Leaderboards -->
+                <aside class="leaderboard" id="leaderboard"></aside>
+
+                <!-- Center Stage -->
+                <main class="stage">
+                    <div class="multiplier-container">
+                        <div class="fire-fx" id="hype-fire"></div>
+                        <div class="meter-bg">
+                            <div id="hype-meter-fill"></div>
+                        </div>
+                        <div id="multiplier-text">x1</div>
+                    </div>
+
+                    <div class="feedback-zone">
+                        <div id="hit-feedback"></div>
+                        <div id="combo-feedback"></div>
+                    </div>
+
+                    <div class="beat-indicator">
+                        <div class="pulse-ring"></div>
+                        <div id="core-beat"></div>
+                    </div>
+
+                    <div id="dancer-container">
+                        <div id="neon-dancer" class="idle">
+                            <div class="head">
+                                <div class="eye left-eye"></div>
+                                <div class="eye right-eye"></div>
+                            </div>
+                            <div class="torso"></div>
+                            <div class="arm arm-left">
+                                <div class="forearm"></div>
+                            </div>
+                            <div class="arm arm-right">
+                                <div class="forearm"></div>
+                            </div>
+                            <div class="leg leg-left">
+                                <div class="lower-leg"></div>
+                            </div>
+                            <div class="leg leg-right">
+                                <div class="lower-leg"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+
+                <!-- Combo History -->
+                <aside class="combo-history">
+                    <div class="neon-title cyan" style="font-size: 1rem; margin-bottom: 20px;">LAST MOVES</div>
+                    <ul id="combo-list"></ul>
+                </aside>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="pad pad-up" data-move="Up"><span class="icon">⬆</span><span class="key-hint">W/↑</span></button>
+                <button class="pad pad-left" data-move="Left"><span class="icon">⬅</span><span class="key-hint">A/←</span></button>
+                <button class="pad pad-down" data-move="Down"><span class="icon">⬇</span><span class="key-hint">S/↓</span></button>
+                <button class="pad pad-right" data-move="Right"><span class="icon">➡</span><span class="key-hint">D/→</span></button>
+            </div>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen">
+            <h1 class="neon-title pink">WINNER:</h1>
+            <h2 id="winner-name" class="neon-title cyan"></h2>
+            <div id="final-scores"></div>
+            <button id="restart-btn" class="neon-button play-btn">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
