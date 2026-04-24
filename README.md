@@ -72,12 +72,13 @@ The built files will be in the `dist/` directory and ready to be deployed to Git
 
 ## Deployment
 
-This project is configured to be deployed on GitHub Pages. The build output in the `dist/` folder will be served from GitHub Pages.
+This project is configured to be deployed on GitHub Pages using the `games.laker.nz` domain.
 
 The games will be accessible at:
-- Hub: `https://your-username.github.io/games/`
-- Game 1: `https://your-username.github.io/games/games/game1/`
-- Game 2: `https://your-username.github.io/games/games/game2/`
+- Hub: `https://games.laker.nz/`
+- Game 1: `https://games.laker.nz/games/game1/`
+- Game 2: `https://games.laker.nz/games/game2/`
+- Trivi: `https://games.laker.nz/trivi/`
 
 ## License
 

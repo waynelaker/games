@@ -3,7 +3,7 @@ import { glob } from 'glob'
 import path from 'path'
 
 export default defineConfig({
-  base: '/games/',
+  base: '/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
