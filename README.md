@@ -9,14 +9,6 @@ games/
 ├── index.html                 (Hub entry point)
 ├── styles.css                 (Hub styles)
 ├── CNAME                      (Custom domain)
-├── games/
-│   ├── game1/
-│   │   ├── index.html
-│   │   └── styles.css
-│   ├── game2/
-│   │   ├── index.html
-│   │   └── styles.css
-│   └── ... (add more games here)
 ├── trivi/                     (Link to trivi game)
 └── README.md
 ```
@@ -27,9 +19,9 @@ No build process needed! This is pure static HTML/CSS/JS. Just clone and push to
 
 ## Adding a New Game
 
-1. Create a new folder under `games/` with your game name:
+1. Create a new folder for your game:
    ```
-   games/my-game/
+   /my-game/
    ```
 
 2. Add the required files:
@@ -50,8 +42,6 @@ GitHub Pages automatically serves this from `games.laker.nz` using:
 ## Game URLs
 
 - Hub: `https://games.laker.nz/`
-- Game 1: `https://games.laker.nz/games/game1/`
-- Game 2: `https://games.laker.nz/games/game2/`
 - Trivi: `https://games.laker.nz/trivi/`
 
 ## License
