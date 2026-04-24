@@ -52,14 +52,12 @@ h1 {
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    animation: flicker 0.15s infinite;
 }
 
 p {
     font-size: 1.3rem;
     margin-bottom: 3rem;
     letter-spacing: 1px;
-    animation: flicker 0.15s infinite;
 }
 
 .games-list {
@@ -128,15 +126,6 @@ p {
     opacity: 0.8;
     position: relative;
     z-index: 1;
-}
-
-@keyframes flicker {
-    0%, 100% {
-        text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-    }
-    50% {
-        text-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 30px rgba(0, 255, 0, 0.6);
-    }
 }
 
 @keyframes scan {
