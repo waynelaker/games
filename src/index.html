@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Games</title>
-    <link rel="stylesheet" href="./styles.css">
+    <title>Games Hub</title>
+    <link rel="stylesheet" href="hub/styles.css">
 </head>
 <body>
-    <div id="app">
-        <h1>🎮 Simple Games</h1>
-        <p>Welcome to the games collection!</p>
-        <p>More games coming soon...</p>
+    <div class="container">
+        <h1>🎮 Games Hub</h1>
+        <p>Select a game to play:</p>
+        <div class="games-list">
+            <a href="games/game1/" class="game-card">
+                <h2>Game 1</h2>
+                <p>Coming soon...</p>
+            </a>
+            <a href="games/game2/" class="game-card">
+                <h2>Game 2</h2>
+                <p>Coming soon...</p>
+            </a>
+        </div>
     </div>
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="hub/main.js"></script>
 </body>
 </html>
