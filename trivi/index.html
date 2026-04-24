@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>trivi</title>
+    <style>
+
+      html {
+        font-size: 90%; /* Reduce overall base font size (default is 100%) */
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vw;     /* Make square */
+        max-height: 100vh; /* Prevent overflow */
+        touch-action: none;
+      }
+
+      .canvas-wrapper {
+        display: flex;
+        justify-content: center;   /* center horizontally */
+        align-items: center;       /* center vertically */
+        height: 100vh;
+        width: 100vw;
+      }    
+
+      .overlay-container {
+        position: absolute;
+        top: 2vh;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 2vw;
+        pointer-events: none; /* allows clicks to pass through, but keep buttons interactive with override */
+      }
+
+      .overlay {
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        max-width: 40vw;
+        pointer-events: auto; /* makes the buttons clickable */
+      }
+
+      .left-overlay {
+        align-items: flex-start;
+      }
+
+      .right-overlay {
+        align-items: flex-end;
+        text-align: right;
+      }
+
+      .title {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: clamp(2rem, 4vw, 4rem); /* Slightly larger */
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        background: linear-gradient(135deg, #ff69b4, #3399ff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        user-select: none;
+      }
+
+
+      .date {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: clamp(1.2rem, 2.5vw, 3rem);
+        font-weight: 700;
+        letter-spacing: 0.1em;      
+        color: #444;
+      }
+
+      .instructions {
+        font-family: sans-serif;
+        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+        color: #444;
+      }
+
+      .win-message {
+        font-size: clamp(1rem, 2vw, 2rem);
+        color: green;
+        font-weight: bold;
+      }
+
+      .button {
+        font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+        padding: 0.6em 1em;
+        background-color: #3399ff;
+        color: white;
+        border: none;
+        border-radius: 0.4em;
+        cursor: pointer;
+      }
+
+      .reset-button:hover {
+        background-color: #2a7dd1;
+      }
+
+
+      .scoreboard {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        color: #222;
+        background-color: #f0f4ff;
+        padding: 0.6em 1em;
+        margin: 0.4em 0;
+        border-radius: 0.5em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .score-card {
+        background-color: #ffffffcc;
+        border: 1px solid #ccc;
+        border-radius: 0.6em;
+        padding: 1em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        font-family: 'Segoe UI', sans-serif;
+        font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        font-weight: 500;
+        min-width: 180px;
+      }
+
+      .score-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .score-table td {
+        padding: 0.3em 0.5em;
+        color: #222;
+      }
+
+      .score-table td:first-child {
+        font-weight: 600;
+        color: #444;
+      }
+
+      .score-table td:last-child {
+        text-align: right;
+        font-weight: bold;
+        color: #0077cc;
+      }
+
+      .score-label {
+        font-family: monospace;
+        display: inline-block;
+        width: 4ch;        /* Enough space for scores up to 9999 */
+        text-align: right; /* Align digits neatly */
+      }
+
+      .score-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 0.2rem;
+      }
+
+      .replay-indicator {
+        display: none;
+        margin-top: 1rem;
+        font-weight: 600;
+        color: #ff6f61;
+        animation: pulse 1.2s infinite;
+      }
+
+      @keyframes pulse {
+        0%   { opacity: 0.3; }
+        50%  { opacity: 1; }
+        100% { opacity: 0.3; }
+      }
+
+   
+    </style>
+  </head>
+  <body>
+    <div class="overlay-container">
+      <div class="overlay left-overlay">
+        <div class="title">trivi</div>
+        <div class="instructions">Make a path between two corners.</div>
+        <button id="reset-button" class="button" onclick="reset()">Reset Game</button>
+        <div id="win-message" class="win-message">You made a complete path!</div>
+        <button id="replay-button" class="button" onclick="replay()">Instant Replay</button>
+        <div id="replay-indicator" class="replay-indicator">Replaying…</div>
+
+      </div>
+      <div class="overlay right-overlay">
+        <div class="date" id="today"></div>    
+        <div class="score-card">
+          <div class="score-title">Scores</div>
+          <table class="score-table">
+            <tr>
+              <td>🎯 Current:</td>
+              <td id="score-value" class="score-label">100</td>
+            </tr>
+            <tr>
+              <td>🏆 Today's Best:</td>
+              <td id="high-score-value" class="score-label">—</td>
+            </tr>
+            <tr>
+              <td>📊 Daily Average:</td>
+              <td id="average-score-value" class="score-label">0</td>
+            </tr>
+          </table>
+          </div>
+      </div>
+    </div> 
+    <div class="canvas-wrapper">
+      <canvas id="game"></canvas>
+    </div>
+    <script>  
+
+      const GameState = {
+        ACTIVE: 'active',
+        INACTIVE: 'inactive',
+        REPLAY_INIT: 'replay_init',
+        REPLAYING: 'replaying'    
+      };
+
+      let score = 100;
+      let triangleRotations = 0;
+      let hexRotations = 0;
+      let gameState = GameState.ACTIVE;
+
+
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const debugging = false; 
+
+      const NUMROWS = 5;
+      let SIDE, HEIGHT, startX, startY;
+
+      // lookup table of triangles that belong to a hex
+      const hextris = [
+        [1, 2, 3, 7, 6, 5],
+        [4, 5, 6, 12, 11, 10],
+        [6, 7, 8, 14, 13, 12],
+        [9, 10, 11, 19, 18, 17],
+        [11, 12, 13, 21, 20, 19],
+        [13, 14, 15, 23, 22, 21]
+      ];
+
+      // triangles ids are as follows:
+      //
+      //                   / \
+      //                  / 0 \                row 0
+      //                 -------
+      //                / \ 2 / \        
+      //               / 1 \ / 3 \             row 1
+      //              -------------
+      //             / \ 5 / \ 7 / \
+      //            / 4 \ / 6 \ / 8 \          row 2
+      //           -------------------
+      //          / \ 10/ \ 12/ \ 14/ \
+      //         / 9 \ / 11\ / 13\ / 15\       row 3
+      //        ------------------------
+      //       / \ 17/ \ 19/ \ 21/ \ 23/ \
+      //      / 16\ / 18\ / 20\ / 22\ / 24\    row 4
+      //     -------------------------------  
+      // lookup table of triangles
+      // array row [a,b,c] where a is the horizontal edge then moving clockwise b and c follow
+      // null represents no neighbor (i.e triangle is at the edge)
+      const neighbours = [
+        
+      // row 0 (tri 0)
+        [2, null, null],
+        
+        // row 1 (tris 1-3)
+        [5, null, 2],
+        [0, 3, 1],
+        [7, 2, null],
+        
+        // row 2 (tris 4-8)
+        [10, null, 5],
+        [1, 6, 4],
+        [12, 5, 7],
+        [3, 8, 6],
+        [14, 7, null],
+
+        // row 3/4 (tris 9-15)
+        [17, null, 10],
+        [4, 11, 9],    
+        [19, 10, 12],
+        [6, 13, 11],
+        [21, 12, 14],
+        [8, 15, 13],
+        [23, 14, null],                            
+
+        // row 4/4 (tris 16-24)   
+        [null, null, 17],
+        [9, 18, 16],
+        [null, 17, 19],
+        [11, 20, 18],
+        [null, 19, 21],
+        [13, 22, 20],
+        [null, 21, 23],          
+        [15, 24, 22],                      
+        [null, 23, null],     
+      ];
+
+
+      class Triangle {
+        constructor(id, cx, cy, pointingUp = true) {
+          this.id = id;
+          this.cx = cx;
+          this.cy = pointingUp ? cy : cy - HEIGHT / 3;
+          this.rotation = 0;
+
+          this.pointingUp = pointingUp;
+          this.isCorner = (id==0) || id == ((NUMROWS-1)*(NUMROWS-1)) || id == ((NUMROWS*NUMROWS)-1) ? true : false ;
+
+          this.highlight = false;
+          this.neighbours = neighbours[id];
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.translate(this.cx, this.cy);
+          ctx.rotate(this.rotation * Math.PI * 2 / 3);
+          
+
+          ctx.strokeStyle = "black";
+          ctx.lineWidth = 2;
+
+          if (debugging) {
+            // debug centre point of triangle
+            ctx.fillStyle = "red";
+            ctx.fillRect(-2, -2, 4, 4); 
+          }
+          
+          const h = HEIGHT;
+          const tipY = this.pointingUp ? -2 * h / 3 : 2 * h / 3;
+          const baseY = this.pointingUp ? h / 3 : -h / 3;
+
+
+          ctx.beginPath();
+          ctx.moveTo(0, tipY);
+          ctx.lineTo(-SIDE / 2, baseY);
+          ctx.lineTo(SIDE / 2, baseY);
+          ctx.closePath();
+          
+          if (this.isCorner) {
+            ctx.fillStyle = this.highlight ? "green" : "gray";      
+            ctx.fill();        
+          }
+        
+          ctx.stroke();
+
+          // curved path
+          if (!this.isCorner) {
+            ctx.beginPath();
+            ctx.strokeStyle =  this.highlight ? "green" : "blue";
+            ctx.lineWidth = 4;
+            if (this.pointingUp) {
+              ctx.arc(0, -HEIGHT*2/3, SIDE/2, Math.PI * 1/3, Math.PI * 2/3);
+            }
+            else {
+              ctx.arc(0, HEIGHT*2/3, SIDE/2, Math.PI * 4/3, Math.PI * 5/3);
+            }
+
+          }     
+          ctx.stroke();
+          ctx.restore();
+
+          if (debugging && !this.isCorner) {
+            // Green debug circle for triangle click area
+            ctx.beginPath();
+            ctx.arc(this.cx, this.cy, SIDE * 0.28, 0, Math.PI * 2);
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 0.5;
+            ctx.stroke();      
+          }
+        }
+
+        contains(x, y) {
+          const dx = x - this.cx;
+          const dy = y - this.cy;
+          return dx * dx + dy * dy < SIDE * 0.28 * SIDE * 0.28;
+        }
+
+        rotate() {
+          if (!this.isCorner) {
+            this.rotation = (this.rotation + 1) % 3;
+            triangleRotations++;
+            score = Math.max(0, score - 10);
+          }
+        }
+
+        
+
+        pathExists(fromTri) {
+          for (let i=0; i<this.neighbours.length; i++) {
+            if(this.neighbours[i] == fromTri && this.rotation != i)  {          
+              return true;          
+            }
+          }
+          return false;
+        }
+      }
+
+      // Generate array of dxs (x offsets) based on num rows
+      // const layout = [
+      //            [ 0],
+      //         [-1, 0, 1],
+      //      [-2,-1, 0, 1, 2],
+      //   [-3,-2,-1, 0, 1, 2, 3],
+      // ...
+      // ];
+      function generateLayout(rows) {
+        const layout = [];
+        for (let r = 0; r < rows; r++) {
+          const row = [];
+          for (let dx = -r; dx <= r; dx++) {
+            row.push(dx);
+          }
+          layout.push(row);
+        }
+        return layout;
+      }
+
+      function rotateHexAtGrid(hex) {
+        let first = triangles[hex.tris[0]].rotation;
+        for (let i=0; i<hex.tris.length-1; i++) {
+          triangles[hex.tris[i]].rotation = (triangles[hex.tris[i+1]].rotation + 1) % 3;
+        }
+        triangles[hex.tris[5]].rotation = (first + 1 ) % 3;
+
+        hexRotations++;
+        score = Math.max(0, score - 1);
+      }
+
+      function drawAll() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);   
+        triangles.forEach(tri => tri.draw(ctx));
+
+        if (debugging) {
+          // Red debug circle for hex click zone
+          hexes.forEach(hex => {
+            ctx.beginPath();
+            ctx.arc(hex.x, hex.y, SIDE * 0.3, 0, Math.PI * 2);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }); 
+        }   
+
+        updateScoreboard();        
+
+      }
+
+      function checkWin() {
+        for (let tri of triangles) {
+          if (tri.isCorner) {
+            if (checkPath(tri)) {
+              gameState = GameState.INACTIVE;
+              setHighScore(score);              
+              drawAll();  
+            }
+          }
+        }
+      }
+
+
+    function checkPath(tri) {
+      triangles.forEach(t => t.highlight = false);    
+      const path = [tri];    
+
+      let tempPath = [tri];
+      let pathFound = true;    
+      while (pathFound) {
+        pathFound = false;
+
+        for (let i = 0; i < tri.neighbours.length; i++) {
+          if (tri.neighbours[i] != null && (i !== tri.rotation || tri.isCorner)) {
+            const neighbour = triangles[tri.neighbours[i]];
+            if (!tempPath.includes(neighbour)) {
+              if (neighbour.isCorner) {
+                tempPath.push(neighbour);
+                // ✅ Only now apply highlight
+                tempPath.forEach(t => t.highlight = true);
+                showWinMessage();
+                return true;
+              }
+
+              if (neighbour.pathExists(tri.id)) {
+                tempPath.push(neighbour);
+                tri = neighbour;
+                pathFound = true;
+                break; // important: go back to top of loop with new tri
+              } else {
+                return false;
+              }
+            }
+          }
+        }
+      }
+
+      return false;
+    }
+
+      
+    function hexClick(hex) {
+
+      if (gameState != GameState.REPLAYING) {
+        moves.push({
+          "type":"hex",
+          "id":hex.id
+        });
+      }
+
+      rotateHexAtGrid(hex);
+      drawAll();
+      ctx.beginPath();
+      ctx.arc(hex.x, hex.y, SIDE * 0.3, 0, Math.PI * 2);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 0.5;
+      ctx.stroke();      
+    }
+
+
+    function triClick(tri) {
+
+      if (!tri.isCorner) {
+        if (gameState != GameState.REPLAYING) {    
+          moves.push({
+            "type":"tri",
+            "id":tri.id
+          });
+        }
+
+        tri.rotate();
+        drawAll();
+        ctx.beginPath();
+        ctx.arc(tri.cx, tri.cy, SIDE * 0.28, 0, Math.PI * 2);
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();      
+      }
+    }
+
+      canvas.addEventListener("click", e => {
+
+        if (gameState != GameState.ACTIVE) {
+          return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        for (const hex of hexes) {
+          const dx = x - hex.x;
+          const dy = y - hex.y;
+          if (dx * dx + dy * dy < (SIDE * 0.3) ** 2) {
+            hexClick(hex);
+            break;
+          }
+        }
+
+        for (const tri of triangles) {
+          if (tri.contains(x, y)) {
+            triClick(tri);
+            break;
+          }
+        }
+
+        checkWin();
+
+      });
+
+      function initCanvas() {   
+        const dpr = window.devicePixelRatio || 1;
+
+        // Calculate sizes in CSS pixels
+        const cssSize = Math.min(window.innerWidth, window.innerHeight);
+        SIDE = cssSize / NUMROWS;
+        HEIGHT = SIDE * Math.sqrt(3) / 2;
+
+        startX = cssSize / 2;
+        startY = (2 * HEIGHT) / 3;
+
+        // Set CSS display size
+        canvas.style.width = `${cssSize}px`;
+        canvas.style.height = `${cssSize}px`;
+      
+        // Set internal pixel buffer size
+        canvas.width = cssSize * dpr;
+        canvas.height = cssSize * dpr;
+
+        // Set transform so 1 unit in code = 1 CSS pixel
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset
+        ctx.scale(dpr, dpr);                // Scale drawing to match pixels
+      }
+
+      function showWinMessage() {
+        document.getElementById("win-message").hidden = false;
+        document.getElementById("replay-button").hidden = false;    
+      }
+
+      function hideWinMessage() {
+        document.getElementById("win-message").hidden = true;
+        document.getElementById("replay-button").hidden = true;        
+      }
+
+      
+
+      const moves = [];
+      const triangles = [];
+      let layout = []
+      const hexes = [];
+
+      function xmur3(str) {
+        let h = 1779033703 ^ str.length;
+        for (let i = 0; i < str.length; i++) {
+          h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+          h = (h << 13) | (h >>> 19);
+        }
+        return () => {
+          h = Math.imul(h ^ (h >>> 16), 2246822507);
+          h = Math.imul(h ^ (h >>> 13), 3266489909);
+          return (h ^= h >>> 16) >>> 0;
+        };
+      }  
+
+      function mulberry32(seed) {
+        return function() {
+          var t = seed += 0x6D2B79F5;
+          t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+      }
+
+      function getLocalDateString() {
+        const now = new Date();
+        const options = {
+          day: 'numeric',      // "d" (e.g., "7")
+          month: 'short',      // "mmm" (e.g., "Jul")
+          year: 'numeric'      // "yyyy" (e.g., "2025")
+        }
+
+        const formattedDate = now.toLocaleDateString('en-GB', options);
+        return formattedDate;
+      }
+
+      function getOrGenerateSeed() {
+        let seedParam = getQueryParam("game");
+
+        if (seedParam) {
+          return parseInt(seedParam, 10);
+        }
+
+        const today = getLocalDateString()
+        document.getElementById("today").textContent = today;
+        const salt = "YouAreVerySneaky";
+        const seed = xmur3(salt + today)();
+        return seed;
+      }  
+
+      function loadDailyTrianglePattern() {
+        const seed = getOrGenerateSeed();
+        const rand = mulberry32(seed);
+
+        for (const tri of triangles) {
+          if (!tri.isCorner) {
+            tri.rotation = Math.floor(rand() * 3);
+          }
+        }
+      }
+      
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function replay() {
+        gameState = GameState.REPLAY_INIT;
+        reset(); // Clear board before replay
+
+        gameState = GameState.REPLAYING;
+
+        const indicator = document.getElementById("replay-indicator");
+        indicator.style.display = "block";
+
+        for (let move of moves) {
+      
+          await sleep(500); // delay between each move
+
+          if (gameState != GameState.REPLAYING) {
+            indicator.style.display = "none";            
+            return;
+          }
+
+          if (move.type === "tri") {
+            triClick(triangles[move.id]);
+          } else if (move.type === "hex") {
+            hexClick(hexes[move.id]);
+          }
+        }
+
+        indicator.style.display = "none";        
+        gameState = GameState.ACTIVE;
+        checkWin();
+      }
+
+
+      function reset() {
+
+        if (gameState == GameState.REPLAYING) {
+          gameState = GameState.INACTIVE;
+        }
+
+        hideWinMessage();
+        initCanvas();
+
+        if (gameState != GameState.REPLAY_INIT) {
+          moves.length = 0;  
+          gameState = GameState.ACTIVE;
+        }
+
+        score = 100;
+        triangleRotations = 0;
+        hexRotations = 0;
+
+        let id = 0;    
+        triangles.length = 0;
+        layout = generateLayout(NUMROWS);    
+        layout.forEach((row, rowIndex) => {
+          const y = startY + rowIndex * HEIGHT;
+          row.forEach((dx, i) => {
+            const x = startX + dx * SIDE * 0.5;
+            const pointingUp = (rowIndex + dx) % 2 === 0;
+            triangles.push(new Triangle(id++, x, y, pointingUp));
+          });
+        });
+
+        loadDailyTrianglePattern();    
+
+        hexes.length = 0;
+        for (let r = 0; r < layout.length - 1; r++) {
+          const row = layout[r];
+          for (let i = 1; i < row.length - 1; i+=2) {
+            const dx = row[i];
+            const x = startX + dx * SIDE * 0.5;
+            const y = startY + r * HEIGHT + HEIGHT / 2 - HEIGHT / 6;
+            hexes.push({id:hexes.length, tris: hextris[hexes.length], x, y, row: r, dx });
+          }
+        }
+
+        drawAll();
+        updateScoreboard();    
+      }
+
+
+      function getTodayKey() {
+        const today = getLocalDateString();
+        return `highscore-${today}`;
+      }
+
+      function getHighScoreForToday() {
+        const key = getTodayKey();
+        return parseInt(localStorage.getItem(key)) || 0;
+      }
+
+      function getAverageHighScore() {
+        let total = 0;
+        let count = 0;
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('highscore-')) {
+            const score = parseInt(localStorage.getItem(key));
+            if (!isNaN(score)) {
+              total += score;
+              count++;
+            }
+          }
+        }
+        return count ? Math.round(total / count) : 0;
+      }
+
+      function setHighScore(score) {
+        const key = getTodayKey();
+        const currentHigh = getHighScoreForToday();
+        if (score > currentHigh) {
+          localStorage.setItem(key, score);
+        }
+      }
+
+
+      function updateScoreboard() {
+        const highScore = getHighScoreForToday();
+        const averageScore = getAverageHighScore();
+
+        document.getElementById("score-value").innerText = score;
+        document.getElementById("high-score-value").innerText = highScore;
+        document.getElementById("average-score-value").innerText = averageScore;
+      }
+
+      reset();
+      checkWin();
+    </script>
+  </body>
+</html>
