@@ -29,6 +29,7 @@ class GameEngine {
         this.onStateChange = null; 
         this.onGameEnd = null;
         this.onAnimSync = null; // Forces visual to reset if state drops
+        this.onTurnStartRequire = null; // Pauses between turns for changeovers
     }
 
     addPlayer(name) {
@@ -47,7 +48,11 @@ class GameEngine {
         this.players.forEach(p => p.score = 0);
         this.currentPlayerIndex = 0;
         
-        this.startTurn();
+        if (this.onTurnStartRequire) {
+            this.onTurnStartRequire(this.players[this.currentPlayerIndex]);
+        } else {
+            this.startTurn();
+        }
         return true;
     }
 
@@ -77,7 +82,11 @@ class GameEngine {
         if (this.currentPlayerIndex >= this.players.length) {
             this.endGame();
         } else {
-            this.startTurn();
+            if (this.onTurnStartRequire) {
+                this.onTurnStartRequire(this.players[this.currentPlayerIndex]);
+            } else {
+                this.startTurn();
+            }
         }
     }
 
@@ -128,10 +137,10 @@ class GameEngine {
                 
             case STATES.NEUTRAL:
                 if (token === "TAP_UP") {
-                    this.setState(STATES.AIR, 400); 
+                    this.setState(STATES.AIR, 1200); 
                     anim = "Jump";
                 } else if (token === "TAP_DOWN") {
-                    this.setState(STATES.CROUCH, 500);
+                    this.setState(STATES.CROUCH, 1200);
                     anim = "Crouch";
                 } else if (token === "TAP_LEFT" || token === "TAP_RIGHT") {
                     anim = token === "TAP_LEFT" ? "Left" : "Right";
@@ -144,13 +153,13 @@ class GameEngine {
                     points += 200;
                     comboTriggered = true;
                     comboName = "AIR SPIN!";
-                    this.setState(STATES.NEUTRAL, 600); 
+                    this.setState(STATES.NEUTRAL, 1200); 
                 } else if (token === "TAP_DOWN") {
                     anim = "Crouch";
                     points += 250;
                     comboTriggered = true;
                     comboName = "DROP DROP!";
-                    this.setState(STATES.CROUCH, 500); 
+                    this.setState(STATES.CROUCH, 1200); 
                 } else if (token !== "TAP_LEFT") {
                     // We ignore TAP_LEFT since that implies they pressed Left intending to Hold it.
                     this.setState(STATES.NEUTRAL);
@@ -159,10 +168,10 @@ class GameEngine {
 
             case STATES.CROUCH:
                 if (token === "HOLD_LEFT") {
-                    this.setState(STATES.PRE_FLAIR, 800); 
+                    this.setState(STATES.PRE_FLAIR, 1200); 
                     anim = "PrepFlair"; 
                 } else if (token === "TAP_UP") {
-                    this.setState(STATES.NEUTRAL, 800);
+                    this.setState(STATES.NEUTRAL, 1200);
                     anim = "Headstand";
                     points += 300;
                     comboTriggered = true;
@@ -174,14 +183,14 @@ class GameEngine {
 
             case STATES.PRE_FLAIR:
                 if (token === "TAP_RIGHT") {
-                    this.setState(STATES.FLAIRING, 600); 
+                    this.setState(STATES.FLAIRING, 1200); 
                     anim = "Flair1"; 
                     this.flairPhase = 1;
                     comboName = "THOMAS FLAIRS STARTED!";
                     comboTriggered = true;
                 }
                 else if (token === "TAP_UP") {
-                    this.setState(STATES.HEAD_SPIN_START, 800);
+                    this.setState(STATES.HEAD_SPIN_START, 1200);
                     anim = "Headstand";
                 } else {
                     this.setState(STATES.NEUTRAL);
@@ -192,12 +201,12 @@ class GameEngine {
                 if (this.flairPhase === 1 && token === "TAP_LEFT") {
                     this.flairPhase = 2;
                     anim = "Flair2";
-                    this.setState(STATES.FLAIRING, 600); 
+                    this.setState(STATES.FLAIRING, 1200); 
                     points += 300;
                 } else if (this.flairPhase === 2 && token === "TAP_RIGHT") {
                     this.flairPhase = 1;
                     anim = "Flair1";
-                    this.setState(STATES.FLAIRING, 600);
+                    this.setState(STATES.FLAIRING, 1200);
                     points += 300;
                 } else {
                     this.missCount++;
@@ -217,7 +226,7 @@ class GameEngine {
 
             case STATES.HEAD_SPIN_START:
                  if (token === "HOLD_RIGHT") {
-                     this.setState(STATES.HEAD_SPIN, 800);
+                     this.setState(STATES.HEAD_SPIN, 1200);
                      anim = "HeadSpin";
                      this.spinPhase = 1;
                      comboName = "HEAD SPIN!";
@@ -231,12 +240,12 @@ class GameEngine {
                 if (this.spinPhase === 1 && token === "TAP_LEFT") {
                     this.spinPhase = 2;
                     anim = "HeadSpin1";
-                    this.setState(STATES.HEAD_SPIN, 600); 
+                    this.setState(STATES.HEAD_SPIN, 1200); 
                     points += 500;
                 } else if (this.spinPhase === 2 && token === "TAP_RIGHT") {
                     this.spinPhase = 1;
                     anim = "HeadSpin2";
-                    this.setState(STATES.HEAD_SPIN, 600);
+                    this.setState(STATES.HEAD_SPIN, 1200);
                     points += 500;
                 } else {
                     this.missCount++;

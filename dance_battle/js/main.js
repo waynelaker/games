@@ -63,13 +63,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Game Navigation ---
+    const readyOverlay = document.getElementById('ready-overlay');
+    const readyPlayerName = document.getElementById('ready-player-name');
+    const readyStartBtn = document.getElementById('ready-start-btn');
+
     startBtn.addEventListener('click', () => {
         startScreen.classList.remove('active');
-        gameScreen.classList.add('active');
-        
-        // Start Audio and Game Loop
-        audioController.start();
         gameEngine.startGame();
+    });
+
+    gameEngine.onTurnStartRequire = (player) => {
+        audioController.stop();
+        gameScreen.classList.remove('active');
+        readyOverlay.classList.add('active');
+        readyPlayerName.textContent = player.name;
+    };
+
+    readyStartBtn.addEventListener('click', () => {
+        readyOverlay.classList.remove('active');
+        gameScreen.classList.add('active');
+        audioController.start();
+        gameEngine.startTurn();
     });
 
     document.getElementById('restart-btn').addEventListener('click', () => {
@@ -78,9 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Input Handling ---
-    let currentDownKey = null;
-    let holdTimer = null;
-    let isHeld = false;
+    const holdTimers = {};
+    const isHeld = {};
     
     const keyMap = {
         'w': 'Up', 'ArrowUp': 'Up',
@@ -112,10 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function handleKeyDown(move) {
-        if (currentDownKey && currentDownKey !== move) return; // enforce one key
-        
-        currentDownKey = move;
-        isHeld = false;
+        if (holdTimers[move]) return; // enforce no-repeat
         
         const pad = document.querySelector('.pad[data-move="' + move + '"]');
         if (pad) pad.classList.add('active-press');
@@ -123,21 +133,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fire tap instantly for rhythm game snappiness!
         emitToken(`TAP_${move.toUpperCase()}`);
 
-        holdTimer = setTimeout(() => {
-            isHeld = true;
+        holdTimers[move] = setTimeout(() => {
+            isHeld[move] = true;
             emitToken(`HOLD_${move.toUpperCase()}`);
-            if (pad) pad.classList.remove('active-press');
-        }, 500); // 500ms = 1 beat hold
+        }, 250); // 250ms = quarter beat hold (allows precise combos)
     }
 
     function handleKeyUp(move) {
         const pad = document.querySelector('.pad[data-move="' + move + '"]');
         if (pad) pad.classList.remove('active-press');
 
-        if (currentDownKey !== move) return;
-        
-        clearTimeout(holdTimer);
-        currentDownKey = null;
+        if (holdTimers[move]) {
+            clearTimeout(holdTimers[move]);
+            delete holdTimers[move];
+        }
+        delete isHeld[move];
     }
 
     // Keyboard
@@ -274,23 +284,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const comboData = [
+        { id: "AIR SPIN!", display: "Air Spin", keys: "↑, Hold ←", count: 0 },
+        { id: "DROP DROP!", display: "Drop Drop", keys: "↑, ↓", count: 0 },
+        { id: "BABY FREEZE!", display: "Baby Freeze", keys: "↓, ↑", count: 0 },
+        { id: "THOMAS FLAIRS STARTED!", display: "Thomas Flairs", keys: "↓, Hold ←, →", count: 0 },
+        { id: "HEAD SPIN!", display: "Head Spin", keys: "↓, Hold ←, ↑, Hold →", count: 0 }
+    ];
+
+    function initComboUI() {
+        comboListEl.innerHTML = '';
+        comboData.forEach(c => {
+            const li = document.createElement('li');
+            li.id = `combo-ui-${c.id.replace(/\W/g, '')}`;
+            li.innerHTML = `<span>${c.display}</span><div class="combo-keys">${c.keys}</div><div class="combo-count cyan">x${c.count}</div>`;
+            comboListEl.appendChild(li);
+        });
+    }
+
     function logCombo(name) {
         if (!name || name === "WRONG MOVE!" || name === "CRASHED OUT!" || name === "SPUN OUT!" || name === "FELL DOWN!" || name === "MISSED BEAT!") return;
         
-        let keys = "";
-        if (name === "AIR SPIN!") keys = "↑ + Hold ←";
-        else if (name === "THOMAS FLAIRS STARTED!") keys = "↓ + Hold ← + →";
-        else if (name === "HEAD SPIN!") keys = "↓ + Hold ← + ↑ + Hold →";
-        else if (name === "BABY FREEZE!") keys = "↓ + ↑";
-        else if (name === "DROP DROP!") keys = "↑ + ↓";
-        
-        const li = document.createElement('li');
-        li.innerHTML = `${name}<div class="combo-keys">${keys}</div>`;
-        comboListEl.prepend(li);
-        
-        // Keep list reasonable length
-        if (comboListEl.children.length > 5) {
-            comboListEl.lastChild.remove();
+        const c = comboData.find(x => x.id === name);
+        if (c) {
+            c.count++;
+            const li = document.getElementById(`combo-ui-${c.id.replace(/\W/g, '')}`);
+            if (li) {
+                li.querySelector('.combo-count').textContent = `x${c.count}`;
+                li.classList.remove('anim-pop');
+                void li.offsetWidth; // trigger reflow
+                li.classList.add('anim-pop');
+            }
         }
     }
+    
+    initComboUI();
 });
