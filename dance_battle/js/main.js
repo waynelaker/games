@@ -278,9 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!name || name === "WRONG MOVE!" || name === "CRASHED OUT!" || name === "SPUN OUT!" || name === "FELL DOWN!" || name === "MISSED BEAT!") return;
         
         let keys = "";
-        if (name === "AIR SPIN!") keys = "[W/↑] + [Hold A/←]";
-        else if (name === "THOMAS FLAIRS STARTED!") keys = "[S/↓] + [Hold A/←] + [D/→]";
-        else if (name === "HEAD SPIN!") keys = "[S/↓] + [Hold A/←] + [W/↑] + [Hold D/→]";
+        if (name === "AIR SPIN!") keys = "↑ + Hold ←";
+        else if (name === "THOMAS FLAIRS STARTED!") keys = "↓ + Hold ← + →";
+        else if (name === "HEAD SPIN!") keys = "↓ + Hold ← + ↑ + Hold →";
+        else if (name === "BABY FREEZE!") keys = "↓ + ↑";
+        else if (name === "DROP DROP!") keys = "↑ + ↓";
         
         const li = document.createElement('li');
         li.innerHTML = `${name}<div class="combo-keys">${keys}</div>`;

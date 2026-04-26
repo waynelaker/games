@@ -185,6 +185,33 @@ body {
     margin-top: 20px;
 }
 
+.combo-guide {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border: 1px solid var(--neon-pink);
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+}
+.combo-guide h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    text-shadow: 0 0 5px var(--neon-blue);
+}
+.combo-guide-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #ccc;
+}
+.combo-guide-list span {
+    color: var(--neon-pink);
+    font-weight: bold;
+}
+
 /* Game Screen */
 header {
     padding: 20px;
@@ -540,8 +567,8 @@ header {
 #neon-dancer {
     position: relative;
     width: 60px;
-    height: 100px;
-    transition: transform 0.1s;
+    height: 120px;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #neon-dancer div {
@@ -550,7 +577,7 @@ header {
     border: 3px solid var(--neon-pink);
     box-shadow: 0 0 10px var(--neon-pink), inset 0 0 5px var(--neon-pink);
     border-radius: 4px;
-    transition: all 0.15s ease;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #neon-dancer .forearm, #neon-dancer .lower-leg {
@@ -580,22 +607,22 @@ header {
 }
 
 .arm, .forearm {
-    width: 8px; height: 20px;
+    width: 8px; height: 26px;
     transform-origin: top center;
 }
 .arm { top: 24px; }
 .arm-left { left: 5px; transform: rotate(25deg); }
 .arm-right { left: 47px; transform: rotate(-25deg); }
-.forearm { top: 17px; left: -3px; transform: rotate(-10deg); }
+.forearm { top: 21px; left: -3px; transform: rotate(-10deg); }
 
 .leg, .lower-leg {
-    width: 10px; height: 20px;
+    width: 10px; height: 32px;
     transform-origin: top center;
 }
 .leg { top: 67px; }
 .leg-left { left: 18px; transform: rotate(10deg); }
 .leg-right { left: 32px; transform: rotate(-10deg); }
-.lower-leg { top: 17px; left: -3px; transform: rotate(0deg); }
+.lower-leg { top: 26px; left: -3px; transform: rotate(0deg); }
 
 /* Animation overrides */
 #neon-dancer.move-Up {
@@ -608,14 +635,15 @@ header {
 #neon-dancer.move-Up .lower-leg { transform: rotate(-20deg); }
 
 #neon-dancer.move-Down {
-    transform: translateY(20px) scaleY(0.85);
+    transform: translateY(20px);
 }
-#neon-dancer.move-Down .torso { top: 28px; }
-#neon-dancer.move-Down .arm { transform: rotate(90deg); top: 31px; }
-#neon-dancer.move-Down .arm-left .forearm { transform: rotate(-90deg); }
-#neon-dancer.move-Down .arm-right .forearm { transform: rotate(90deg); }
-#neon-dancer.move-Down .leg { transform: rotate(60deg); height: 15px;}
-#neon-dancer.move-Down .lower-leg { transform: rotate(-120deg); height: 15px;}
+#neon-dancer.move-Down .torso { top: 35px; }
+#neon-dancer.move-Down .head { top: 12px; }
+#neon-dancer.move-Down .arm { top: 35px; transform: rotate(-30deg); }
+#neon-dancer.move-Down .leg-left { transform: rotate(70deg); left: 10px; }
+#neon-dancer.move-Down .leg-right { transform: rotate(-70deg); left: 40px; }
+#neon-dancer.move-Down .lower-leg { transform: rotate(-70deg); }
+#neon-dancer.move-Down .leg-right .lower-leg { transform: rotate(70deg); }
 
 #neon-dancer.move-Left {
     transform: translateX(-20px);
@@ -640,11 +668,18 @@ header {
 #neon-dancer.move-Jump { transform: translateY(-80px); }
 #neon-dancer.move-Jump .arm { transform: rotate(180deg); }
 
-#neon-dancer.move-Crouch { transform: translateY(50px); }
-#neon-dancer.move-Crouch .leg-left { transform: rotate(90deg); top: -10px; }
-#neon-dancer.move-Crouch .leg-right { transform: rotate(-90deg); top: -10px; }
-#neon-dancer.move-Crouch .lower-leg { transform: rotate(0deg); }
-#neon-dancer.move-Crouch .arm { transform: rotate(-45deg); top: 21px; }
+#neon-dancer.move-Crouch { 
+    transform: translateY(25px); 
+}
+#neon-dancer.move-Crouch .torso { top: 40px; }
+#neon-dancer.move-Crouch .head { top: 17px; }
+#neon-dancer.move-Crouch .arm { transform: rotate(60deg); top: 42px; }
+#neon-dancer.move-Crouch .arm-left .forearm { transform: rotate(-45deg); }
+#neon-dancer.move-Crouch .arm-right .forearm { transform: rotate(45deg); }
+#neon-dancer.move-Crouch .leg-left { transform: rotate(80deg); left: 0px; top: 75px; }
+#neon-dancer.move-Crouch .leg-right { transform: rotate(-80deg); left: 45px; top: 75px; }
+#neon-dancer.move-Crouch .leg-left .lower-leg { transform: rotate(-80deg); }
+#neon-dancer.move-Crouch .leg-right .lower-leg { transform: rotate(80deg); }
 
 @keyframes airSpinAnim {
     0% { transform: translateY(-80px) rotateY(0deg); }
@@ -679,9 +714,58 @@ header {
 #neon-dancer.move-Fall .leg { transform: rotate(0deg); }
 
 @keyframes idleBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
+    0%, 100% { transform: translateY(0) scaleY(1) rotate(0deg); }
+    25% { transform: translateY(4px) scaleY(0.95) rotate(5deg); }
+    50% { transform: translateY(10px) scaleY(0.9) rotate(0deg); }
+    75% { transform: translateY(4px) scaleY(0.95) rotate(-5deg); }
 }
 #neon-dancer.idle {
-    animation: idleBounce 0.5s infinite;
+    animation: idleBounce 0.8s infinite ease-in-out;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .neon-title {
+        font-size: 2rem;
+    }
+    
+    #player-list-setup {
+        flex-direction: column;
+    }
+    
+    #player-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #add-player-btn {
+        width: 100%;
+    }
+    
+    .pad {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .pad .icon {
+        font-size: 1.5rem;
+    }
+    
+    .controls {
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    /* Make sidebars smaller or hide them to prioritize game area */
+    .leaderboard, .combo-history {
+        width: 100px;
+        font-size: 0.7rem;
+        padding: 10px;
+    }
+    .combo-history {
+        display: none; /* Might overflow horizontally on small phones, prioritize central action */
+    }
+    .combo-guide-list {
+        grid-template-columns: 1fr;
+    }
 }

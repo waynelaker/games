@@ -145,6 +145,12 @@ class GameEngine {
                     comboTriggered = true;
                     comboName = "AIR SPIN!";
                     this.setState(STATES.NEUTRAL, 600); 
+                } else if (token === "TAP_DOWN") {
+                    anim = "Crouch";
+                    points += 250;
+                    comboTriggered = true;
+                    comboName = "DROP DROP!";
+                    this.setState(STATES.CROUCH, 500); 
                 } else if (token !== "TAP_LEFT") {
                     // We ignore TAP_LEFT since that implies they pressed Left intending to Hold it.
                     this.setState(STATES.NEUTRAL);
@@ -155,6 +161,12 @@ class GameEngine {
                 if (token === "HOLD_LEFT") {
                     this.setState(STATES.PRE_FLAIR, 800); 
                     anim = "PrepFlair"; 
+                } else if (token === "TAP_UP") {
+                    this.setState(STATES.NEUTRAL, 800);
+                    anim = "Headstand";
+                    points += 300;
+                    comboTriggered = true;
+                    comboName = "BABY FREEZE!";
                 } else if (token !== "TAP_LEFT") {
                     this.setState(STATES.NEUTRAL);
                 }
