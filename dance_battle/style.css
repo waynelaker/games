@@ -21,7 +21,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-ui);
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
     display: flex;
@@ -39,7 +39,6 @@ body {
     width: 100%;
     max-width: 1000px;
     height: 100%;
-    max-height: 800px;
     position: relative;
     border: 2px solid var(--neon-blue);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.1);
@@ -73,6 +72,27 @@ body {
     align-items: center;
     justify-content: center;
     gap: 30px;
+    overflow-y: auto;
+}
+
+/* Ready Overlay - sits on top of game screen */
+#ready-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 50;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+#ready-overlay.active {
+    display: flex;
+}
+.ready-btn {
+    padding: 10px 24px !important;
+    font-size: 0.9rem !important;
 }
 
 .neon-title {
@@ -265,7 +285,7 @@ header {
 
 .combo-history {
     width: 180px;
-    padding: 10px;
+    padding: 8px;
     border-left: 1px solid rgba(0,255,255,0.2);
     display: flex;
     flex-direction: column;
@@ -274,35 +294,48 @@ header {
 
 #combo-list {
     list-style: none;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 #combo-list li {
-    background: rgba(255, 0, 255, 0.1);
-    border: 1px solid rgba(255, 0, 255, 0.3);
-    padding: 5px 6px;
-    border-radius: 4px;
-    text-align: center;
+    background: rgba(255, 0, 255, 0.08);
+    border: 1px solid rgba(255, 0, 255, 0.2);
+    padding: 4px 6px;
+    border-radius: 3px;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    gap: 6px;
+}
+
+#combo-list li span {
+    font-weight: bold;
+    color: var(--neon-pink);
+    white-space: nowrap;
 }
 
 #combo-list .combo-keys {
     color: var(--neon-yellow);
-    font-size: 0.65rem;
-    margin-top: 2px;
+    font-size: 0.6rem;
+    flex: 1;
 }
 
 .combo-count {
     font-family: var(--font-heading);
-    font-size: 0.8rem;
-    margin-top: 2px;
+    font-size: 0.7rem;
     color: var(--neon-blue);
     text-shadow: 0 0 5px var(--neon-blue);
+    white-space: nowrap;
+}
+
+@keyframes comboFlash {
+    0% { border-color: var(--neon-green); background: rgba(0, 255, 0, 0.25); }
+    100% { border-color: rgba(255, 0, 255, 0.2); background: rgba(255, 0, 255, 0.08); }
+}
+.combo-hit {
+    animation: comboFlash 0.8s ease-out;
 }
 
 
@@ -476,11 +509,12 @@ header {
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(0deg, rgba(0,0,0,0.95), transparent);
+    gap: 12px;
+    padding: 10px;
+    background: rgba(0,0,0,0.9);
     border-top: 1px solid rgba(255,255,255,0.1);
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .pad {
@@ -698,14 +732,23 @@ header {
 }
 #neon-dancer.move-AirSpin { animation: airSpinAnim 0.6s ease-in-out forwards; }
 
-#neon-dancer.move-PrepFlair { transform: translateY(40px) rotateZ(-30deg); }
-#neon-dancer.move-PrepFlair .leg-left { transform: rotate(90deg); left: -40px; }
+#neon-dancer.move-PrepFlair { transform: translateY(30px) rotateZ(-20deg); }
+#neon-dancer.move-PrepFlair .arm { transform: rotate(160deg); top: 10px; }
+#neon-dancer.move-PrepFlair .leg-left { transform: rotate(90deg); }
+#neon-dancer.move-PrepFlair .leg-right { transform: rotate(-40deg); }
+#neon-dancer.move-PrepFlair .lower-leg { transform: rotate(-30deg); }
 
-#neon-dancer.move-Flair1 { transform: translateY(30px) rotateZ(20deg) scaleX(1.2); }
-#neon-dancer.move-Flair1 .leg-right { transform: rotate(120deg); top: -20px; }
+#neon-dancer.move-Flair1 { transform: translateY(25px) rotateZ(25deg); }
+#neon-dancer.move-Flair1 .arm { transform: rotate(180deg); top: 10px; }
+#neon-dancer.move-Flair1 .leg-left { transform: rotate(30deg); }
+#neon-dancer.move-Flair1 .leg-right { transform: rotate(100deg); left: 20px; }
+#neon-dancer.move-Flair1 .leg-right .lower-leg { transform: rotate(30deg); }
 
-#neon-dancer.move-Flair2 { transform: translateY(30px) rotateZ(-20deg) scaleX(1.2); }
-#neon-dancer.move-Flair2 .leg-left { transform: rotate(-120deg); top: -20px; }
+#neon-dancer.move-Flair2 { transform: translateY(25px) rotateZ(-25deg); }
+#neon-dancer.move-Flair2 .arm { transform: rotate(180deg); top: 10px; }
+#neon-dancer.move-Flair2 .leg-right { transform: rotate(-30deg); }
+#neon-dancer.move-Flair2 .leg-left { transform: rotate(-100deg); left: 30px; }
+#neon-dancer.move-Flair2 .leg-left .lower-leg { transform: rotate(-30deg); }
 
 #neon-dancer.move-Headstand { transform: translateY(20px) rotateZ(180deg); }
 #neon-dancer.move-Headstand .arm { transform: rotate(180deg); top: 21px; }
@@ -736,8 +779,22 @@ header {
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
+    body {
+        height: 100dvh;
+    }
+    
+    #game-container {
+        border: none;
+        border-radius: 0;
+    }
+    
     .neon-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+    
+    #start-screen {
+        gap: 15px;
+        padding: 10px;
     }
     
     #player-list-setup {
@@ -753,58 +810,65 @@ header {
         width: 100%;
     }
     
+    header {
+        padding: 8px;
+    }
+    .turn-info h2 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .controls {
+        padding: 8px;
+        gap: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+    
     .pad {
         width: 60px;
         height: 60px;
     }
-    
     .pad .icon {
-        font-size: 1.5rem;
-    }
-    
-    .controls {
-        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
-        gap: 8px;
-    }
-    
-    .pad {
-        width: 55px;
-        height: 55px;
-    }
-    .pad .icon {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
     }
     .pad .key-hint {
         font-size: 0.5rem;
     }
     
-    /* Make sidebars smaller or hide them to prioritize game area */
     .game-area {
         flex-direction: column;
-        overflow-y: auto;
+        overflow: hidden;
     }
     .leaderboard {
         width: 100%;
         height: auto;
         font-size: 0.6rem;
-        padding: 5px;
+        padding: 4px;
         flex-direction: row;
-        gap: 5px;
+        gap: 4px;
         border-right: none;
         border-bottom: 1px solid rgba(0,255,255,0.2);
+        flex-shrink: 0;
     }
     .player-score {
         padding: 4px;
         flex: 1;
     }
+    .player-score .name {
+        font-size: 0.55rem;
+        margin-bottom: 3px;
+    }
+    .player-score .score {
+        font-size: 1rem;
+    }
     .combo-history {
         width: 100%;
         height: auto;
-        max-height: 120px;
-        padding: 5px;
+        max-height: 80px;
+        padding: 4px;
         border: none;
         border-top: 1px solid rgba(0,255,255,0.2);
-        display: flex;
+        flex-shrink: 0;
         overflow-y: auto;
     }
     .combo-history .neon-title {
@@ -813,19 +877,32 @@ header {
     #combo-list {
         flex-direction: row;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 4px;
+        gap: 3px;
         width: 100%;
     }
     #combo-list li {
-        flex: 1 1 45%;
-        padding: 3px 4px;
-        font-size: 0.6rem;
+        flex: 1 1 48%;
+        padding: 2px 4px;
+        font-size: 0.55rem;
     }
     .combo-count {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
     }
-    .combo-guide-list {
-        grid-template-columns: 1fr;
+    
+    .stage {
+        padding: 5px;
+        min-height: 0;
+    }
+    #dancer-container {
+        transform: scale(1.2);
+    }
+    .feedback-zone {
+        top: 10%;
+    }
+    .multiplier-container {
+        left: 5px;
+    }
+    .meter-bg {
+        height: 100px;
     }
 }

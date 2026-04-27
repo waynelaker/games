@@ -22,30 +22,19 @@
                 <ul id="players-ul"></ul>
             </div>
 
-            <div class="combo-guide">
-                <h3 class="cyan">SECRET COMBOS</h3>
-                <ul class="combo-guide-list">
-                    <li><span>Air Spin</span>: ↑, Hold ←</li>
-                    <li><span>Drop Drop</span>: ↑, ↓</li>
-                    <li><span>Baby Freeze</span>: ↓, ↑</li>
-                    <li><span>Thomas Flairs</span>: ↓, Hold ←, →</li>
-                    <li><span>Head Spin</span>: ↓, Hold ←, ↑, Hold →</li>
-                </ul>
-            </div>
             
             <button id="start-btn" class="neon-button play-btn" disabled>PLAY</button>
             <p class="instructions">Supports Keyboard (Arrows), Mouse, and Touch.</p>
         </div>
 
-        <!-- Get Ready Screen -->
-        <div id="ready-overlay" class="screen">
-            <h1 class="neon-title cyan">GET READY!</h1>
-            <h2 id="ready-player-name" class="neon-title pink" style="margin: 30px 0;">Player</h2>
-            <button id="ready-start-btn" class="neon-button play-btn">START TURN</button>
-        </div>
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen">
+            <!-- Ready Overlay (sits on top of game view) -->
+            <div id="ready-overlay">
+                <h2 id="ready-player-name" class="neon-title pink">Player</h2>
+                <button id="ready-start-btn" class="neon-button ready-btn">START TURN</button>
+            </div>
             <header>
                 <div class="turn-info">
                     <h2>TURN: <span id="current-player-name" class="cyan">Player</span></h2>

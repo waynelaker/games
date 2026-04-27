@@ -69,19 +69,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startBtn.addEventListener('click', () => {
         startScreen.classList.remove('active');
+        gameScreen.classList.add('active');
         gameEngine.startGame();
     });
 
     gameEngine.onTurnStartRequire = (player) => {
         audioController.stop();
-        gameScreen.classList.remove('active');
         readyOverlay.classList.add('active');
         readyPlayerName.textContent = player.name;
+        
+        // Reset combo counts for the new player's turn
+        comboData.forEach(c => c.count = 0);
+        initComboUI();
     };
 
     readyStartBtn.addEventListener('click', () => {
         readyOverlay.classList.remove('active');
-        gameScreen.classList.add('active');
         audioController.start();
         gameEngine.startTurn();
     });
@@ -223,7 +226,17 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.classList.remove('active');
         gameOverScreen.classList.add('active');
 
-        document.getElementById('winner-name').textContent = sortedPlayers[0].name;
+        // Check for draws
+        const topScore = sortedPlayers[0].score;
+        const winners = sortedPlayers.filter(p => p.score === topScore);
+        
+        if (winners.length > 1) {
+            document.getElementById('winner-name').textContent = winners.map(w => w.name).join(' & ');
+            document.querySelector('#game-over-screen .neon-title').textContent = 'DRAW!';
+        } else {
+            document.getElementById('winner-name').textContent = sortedPlayers[0].name;
+            document.querySelector('#game-over-screen .neon-title').textContent = 'WINNER:';
+        }
 
         const finalUl = document.getElementById('final-scores');
         finalUl.innerHTML = '';
@@ -265,13 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showFeedback(accuracy, comboText) {
-        hitFeedback.textContent = accuracy;
-        hitFeedback.className = '';
-        void hitFeedback.offsetWidth; // reflow
-        
-        hitFeedback.classList.add(accuracy.toLowerCase());
-        hitFeedback.classList.add('anim-pop');
-
         if (comboText) {
             comboFeedback.textContent = comboText;
             comboFeedback.classList.remove('anim-pop');
@@ -279,8 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
             comboFeedback.classList.add('anim-pop');
             
             logCombo(comboText);
-        } else {
-             // Let it fade or remain until next
         }
     }
 
@@ -311,9 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.getElementById(`combo-ui-${c.id.replace(/\W/g, '')}`);
             if (li) {
                 li.querySelector('.combo-count').textContent = `x${c.count}`;
-                li.classList.remove('anim-pop');
+                li.classList.remove('combo-hit');
                 void li.offsetWidth; // trigger reflow
-                li.classList.add('anim-pop');
+                li.classList.add('combo-hit');
             }
         }
     }

@@ -237,15 +237,10 @@ class GameEngine {
                  break;
 
             case STATES.HEAD_SPIN:
-                if (this.spinPhase === 1 && token === "TAP_LEFT") {
-                    this.spinPhase = 2;
-                    anim = "HeadSpin1";
+                if (token === "TAP_RIGHT") {
+                    this.spinPhase = this.spinPhase === 1 ? 2 : 1;
+                    anim = this.spinPhase === 2 ? "HeadSpin1" : "HeadSpin2";
                     this.setState(STATES.HEAD_SPIN, 1200); 
-                    points += 500;
-                } else if (this.spinPhase === 2 && token === "TAP_RIGHT") {
-                    this.spinPhase = 1;
-                    anim = "HeadSpin2";
-                    this.setState(STATES.HEAD_SPIN, 1200);
                     points += 500;
                 } else {
                     this.missCount++;
