@@ -732,23 +732,37 @@ header {
 }
 #neon-dancer.move-AirSpin { animation: airSpinAnim 0.6s ease-in-out forwards; }
 
-#neon-dancer.move-PrepFlair { transform: translateY(30px) rotateZ(-20deg); }
-#neon-dancer.move-PrepFlair .arm { transform: rotate(160deg); top: 10px; }
-#neon-dancer.move-PrepFlair .leg-left { transform: rotate(90deg); }
-#neon-dancer.move-PrepFlair .leg-right { transform: rotate(-40deg); }
-#neon-dancer.move-PrepFlair .lower-leg { transform: rotate(-30deg); }
+/* PrepFlair: start leaning, plant one hand */
+#neon-dancer.move-PrepFlair { transform: translateY(45px) rotateZ(30deg); }
+#neon-dancer.move-PrepFlair .arm-right { transform: rotate(-45deg); }
+#neon-dancer.move-PrepFlair .arm-right .forearm { transform: rotate(0deg); }
+#neon-dancer.move-PrepFlair .arm-left { transform: rotate(20deg); }
+#neon-dancer.move-PrepFlair .arm-left .forearm { transform: rotate(0deg); }
+#neon-dancer.move-PrepFlair .leg-left { transform: rotate(-80deg); }
+#neon-dancer.move-PrepFlair .leg-left .lower-leg { transform: rotate(0deg); }
+#neon-dancer.move-PrepFlair .leg-right { transform: rotate(40deg); }
 
-#neon-dancer.move-Flair1 { transform: translateY(25px) rotateZ(25deg); }
-#neon-dancer.move-Flair1 .arm { transform: rotate(180deg); top: 10px; }
-#neon-dancer.move-Flair1 .leg-left { transform: rotate(30deg); }
-#neon-dancer.move-Flair1 .leg-right { transform: rotate(100deg); left: 20px; }
-#neon-dancer.move-Flair1 .leg-right .lower-leg { transform: rotate(30deg); }
+/* Flair1: lean RIGHT 45°, right arm vertical (support), left arm relaxed, legs straddle high */
+#neon-dancer.move-Flair1 { transform: translateY(45px) rotateZ(45deg); }
+#neon-dancer.move-Flair1 .arm-right { transform: rotate(-45deg); }
+#neon-dancer.move-Flair1 .arm-right .forearm { transform: rotate(0deg); }
+#neon-dancer.move-Flair1 .arm-left { transform: rotate(15deg); }
+#neon-dancer.move-Flair1 .arm-left .forearm { transform: rotate(0deg); }
+#neon-dancer.move-Flair1 .leg-left { transform: rotate(-130deg); }
+#neon-dancer.move-Flair1 .leg-left .lower-leg { transform: rotate(0deg); }
+#neon-dancer.move-Flair1 .leg-right { transform: rotate(100deg); }
+#neon-dancer.move-Flair1 .leg-right .lower-leg { transform: rotate(0deg); }
 
-#neon-dancer.move-Flair2 { transform: translateY(25px) rotateZ(-25deg); }
-#neon-dancer.move-Flair2 .arm { transform: rotate(180deg); top: 10px; }
-#neon-dancer.move-Flair2 .leg-right { transform: rotate(-30deg); }
-#neon-dancer.move-Flair2 .leg-left { transform: rotate(-100deg); left: 30px; }
-#neon-dancer.move-Flair2 .leg-left .lower-leg { transform: rotate(-30deg); }
+/* Flair2: lean LEFT 45° (mirror), left arm vertical, right arm relaxed, legs other way */
+#neon-dancer.move-Flair2 { transform: translateY(45px) rotateZ(-45deg); }
+#neon-dancer.move-Flair2 .arm-left { transform: rotate(45deg); }
+#neon-dancer.move-Flair2 .arm-left .forearm { transform: rotate(0deg); }
+#neon-dancer.move-Flair2 .arm-right { transform: rotate(-15deg); }
+#neon-dancer.move-Flair2 .arm-right .forearm { transform: rotate(0deg); }
+#neon-dancer.move-Flair2 .leg-right { transform: rotate(130deg); }
+#neon-dancer.move-Flair2 .leg-right .lower-leg { transform: rotate(0deg); }
+#neon-dancer.move-Flair2 .leg-left { transform: rotate(-100deg); }
+#neon-dancer.move-Flair2 .leg-left .lower-leg { transform: rotate(0deg); }
 
 #neon-dancer.move-Headstand { transform: translateY(20px) rotateZ(180deg); }
 #neon-dancer.move-Headstand .arm { transform: rotate(180deg); top: 21px; }
@@ -766,6 +780,33 @@ header {
 #neon-dancer.move-Fall { transform: translateY(60px) rotateZ(90deg); filter: grayscale(100%); opacity: 0.5; }
 #neon-dancer.move-Fall .arm { transform: rotate(180deg); }
 #neon-dancer.move-Fall .leg { transform: rotate(0deg); }
+
+/* HighJump: higher than normal jump */
+#neon-dancer.move-HighJump { transform: translateY(-110px); }
+#neon-dancer.move-HighJump .arm { transform: rotate(180deg); }
+#neon-dancer.move-HighJump .leg-left { transform: rotate(20deg); }
+#neon-dancer.move-HighJump .leg-right { transform: rotate(-20deg); }
+#neon-dancer.move-HighJump .lower-leg { transform: rotate(-20deg); }
+
+/* Back Flip */
+@keyframes backFlipAnim {
+    0% { transform: translateY(-110px) rotateX(0deg); }
+    40% { transform: translateY(-130px) rotateX(-180deg); }
+    100% { transform: translateY(0px) rotateX(-360deg); }
+}
+#neon-dancer.move-BackFlip { animation: backFlipAnim 0.7s ease-in forwards; }
+#neon-dancer.move-BackFlip .arm { transform: rotate(180deg); }
+#neon-dancer.move-BackFlip .leg { transform: rotate(0deg); }
+
+/* Front Flip */
+@keyframes frontFlipAnim {
+    0% { transform: translateY(-110px) rotateX(0deg); }
+    40% { transform: translateY(-130px) rotateX(180deg); }
+    100% { transform: translateY(0px) rotateX(360deg); }
+}
+#neon-dancer.move-FrontFlip { animation: frontFlipAnim 0.7s ease-in forwards; }
+#neon-dancer.move-FrontFlip .arm { transform: rotate(180deg); }
+#neon-dancer.move-FrontFlip .leg { transform: rotate(0deg); }
 
 @keyframes idleBounce {
     0%, 100% { transform: translateY(0) scaleY(1) rotate(0deg); }

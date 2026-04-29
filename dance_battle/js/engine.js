@@ -6,7 +6,8 @@ const STATES = {
    FLAIRING: 4,
    HEAD_SPIN_START: 5,
    HEAD_SPIN: 6,
-   FALLEN: 7
+   FALLEN: 7,
+   AIR_HIGH: 8
 };
 
 class GameEngine {
@@ -160,8 +161,28 @@ class GameEngine {
                     comboTriggered = true;
                     comboName = "DROP DROP!";
                     this.setState(STATES.CROUCH, 1200); 
+                } else if (token === "TAP_UP") {
+                    anim = "HighJump";
+                    this.setState(STATES.AIR_HIGH, 1200);
                 } else if (token !== "TAP_LEFT") {
-                    // We ignore TAP_LEFT since that implies they pressed Left intending to Hold it.
+                    this.setState(STATES.NEUTRAL);
+                }
+                break;
+
+            case STATES.AIR_HIGH:
+                if (token === "TAP_LEFT") {
+                    anim = "BackFlip";
+                    points += 400;
+                    comboTriggered = true;
+                    comboName = "BACK FLIP!";
+                    this.setState(STATES.NEUTRAL, 1200);
+                } else if (token === "TAP_RIGHT") {
+                    anim = "FrontFlip";
+                    points += 400;
+                    comboTriggered = true;
+                    comboName = "FRONT FLIP!";
+                    this.setState(STATES.NEUTRAL, 1200);
+                } else {
                     this.setState(STATES.NEUTRAL);
                 }
                 break;
@@ -186,7 +207,7 @@ class GameEngine {
                     this.setState(STATES.FLAIRING, 1200); 
                     anim = "Flair1"; 
                     this.flairPhase = 1;
-                    comboName = "THOMAS FLAIRS STARTED!";
+                    comboName = "FLARE!";
                     comboTriggered = true;
                 }
                 else if (token === "TAP_UP") {

@@ -291,8 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const comboData = [
         { id: "AIR SPIN!", display: "Air Spin", keys: "↑, Hold ←", count: 0 },
         { id: "DROP DROP!", display: "Drop Drop", keys: "↑, ↓", count: 0 },
+        { id: "BACK FLIP!", display: "Back Flip", keys: "↑, ↑, ←", count: 0 },
+        { id: "FRONT FLIP!", display: "Front Flip", keys: "↑, ↑, →", count: 0 },
         { id: "BABY FREEZE!", display: "Baby Freeze", keys: "↓, ↑", count: 0 },
-        { id: "THOMAS FLAIRS STARTED!", display: "Thomas Flairs", keys: "↓, Hold ←, →", count: 0 },
+        { id: "FLARE!", display: "Flare", keys: "↓, Hold ←, →", count: 0 },
         { id: "HEAD SPIN!", display: "Head Spin", keys: "↓, Hold ←, ↑, Hold →", count: 0 }
     ];
 
